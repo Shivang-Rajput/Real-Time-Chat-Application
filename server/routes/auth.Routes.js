@@ -15,6 +15,7 @@ router.get("/test", protect, (req, res) => {
   res.json({
     success: true,
     message: "Protected Route Accessed ✅",
+    user: req.user,
   });
 });
 
