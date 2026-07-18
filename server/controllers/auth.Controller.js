@@ -56,3 +56,59 @@ export const registerUser = async (req, res) => {
     });
   }
 };
+
+
+export const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate Input
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and Password are required",
+      });
+    }
+
+    // Find User
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    // Compare Password
+const isMatch = await bcrypt.compare(password, user.password);
+
+if (!isMatch) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid email or password",
+  });
+}
+
+// Generate JWT
+const token = generateToken(user._id);
+
+// Remove password before sending response
+user.password = undefined;
+
+res.status(200).json({
+  success: true,
+  message: "Login Successful 🎉",
+  token,
+  user,
+});
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
