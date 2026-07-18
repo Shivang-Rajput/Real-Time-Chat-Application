@@ -1,10 +1,11 @@
 import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 
 export const registerUser = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
-    // Validate Input
+    // Validate input
     if (!fullName || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -12,12 +13,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    console.log("Received Data:");
-    console.log("Full Name:", fullName);
-    console.log("Email:", email);
-    console.log("Password:", password);
-
-    // Check if user already exists
+    // Check if user exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -27,9 +23,23 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Save user
+    const user = await User.create({
+      fullName,
+      email,
+      password: hashedPassword,
+    });
+
+    console.log("New User Created:");
+    console.log(user);
+
+    res.status(201).json({
       success: true,
-      message: "Email is available ✅",
+      message: "User Registered Successfully 🎉",
+      user,
     });
 
   } catch (error) {
