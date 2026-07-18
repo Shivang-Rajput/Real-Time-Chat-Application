@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import generateToken from "../utils/generateToken.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -13,7 +14,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // Check if user exists
+    // Check existing user
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -26,19 +27,23 @@ export const registerUser = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save user
+    // Create user
     const user = await User.create({
       fullName,
       email,
       password: hashedPassword,
     });
 
-    console.log("New User Created:");
-    console.log(user);
+    // Generate JWT
+    const token = generateToken(user._id);
+
+    // Don't send password back
+    user.password = undefined;
 
     res.status(201).json({
       success: true,
       message: "User Registered Successfully 🎉",
+      token,
       user,
     });
 
