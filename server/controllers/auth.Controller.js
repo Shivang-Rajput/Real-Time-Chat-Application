@@ -129,3 +129,39 @@ export const getProfile = async (req, res) => {
     });
   }
 };
+
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { fullName } = req.body;
+
+    // Validation
+    if (!fullName) {
+      return res.status(400).json({
+        success: false,
+        message: "Full Name is required",
+      });
+    }
+
+    // Update User
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { fullName },
+      { new: true }
+    ).select("-password");
+
+    res.status(200).json({
+      success: true,
+      message: "Profile Updated Successfully 🎉",
+      user: updatedUser,
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};

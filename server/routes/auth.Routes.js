@@ -3,6 +3,7 @@ import {
   registerUser,
   loginUser,
   getProfile,
+  updateProfile,
 } from "../controllers/auth.controller.js";
 import protect from "../middleware/auth.middleware.js";
 
@@ -13,6 +14,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 
 router.get("/profile", protect, getProfile);
+
+router.put("/profile", protect, updateProfile);
 
 router.get("/test", protect, (req, res) => {
   res.json({
