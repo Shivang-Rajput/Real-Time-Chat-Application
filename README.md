@@ -29,3 +29,14 @@ Follow these instructions to set up the project locally on your machine.
    ```bash
    git clone [https://github.com/yourusername/real-time-chat-app.git](https://github.com/yourusername/real-time-chat-app.git)
    cd real-time-chat-app
+
+cd server
+npm install
+# Create a .env file and add your JWT_SECRET and PORT
+npm run dev
+
+
+cd ../client
+npm install
+npm start
+   
