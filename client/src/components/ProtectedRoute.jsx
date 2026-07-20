@@ -1,0 +1,23 @@
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+
+  // Wait until AuthContext has finished loading
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-slate-900">
+        <p className="text-white text-xl">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+export default ProtectedRoute;

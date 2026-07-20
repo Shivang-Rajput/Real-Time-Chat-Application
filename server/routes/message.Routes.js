@@ -1,10 +1,53 @@
 import express from "express";
 import protect from "../middleware/auth.middleware.js";
-import { sendMessage } from "../controllers/message.controller.js";
+import upload from "../middleware/upload.middleware.js";
+
+import {
+  sendMessage,
+  getMessages,
+  markMessagesSeen,
+  deleteMessageForMe,
+} from "../controllers/message.controller.js";
 
 const router = express.Router();
 
+// ==========================================
 // Send Message
-router.post("/send/:receiverId", protect, sendMessage);
+// POST /api/messages/send/:receiverId
+// ==========================================
+router.post(
+  "/send/:receiverId",
+  protect,
+  upload.single("image"),
+  sendMessage
+);
+
+// ==========================================
+// Delete Message (Delete For Me)
+// DELETE /api/messages/:messageId
+// ==========================================
+router.delete(
+  "/:messageId",
+  protect,
+  deleteMessageForMe
+);
+
+// ==========================================
+// Mark Seen
+// ==========================================
+router.put(
+  "/seen/:userId",
+  protect,
+  markMessagesSeen
+);
+
+// ==========================================
+// Get Messages
+// ==========================================
+router.get(
+  "/:receiverId",
+  protect,
+  getMessages
+);
 
 export default router;
