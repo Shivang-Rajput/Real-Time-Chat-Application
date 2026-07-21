@@ -5,7 +5,7 @@ import upload from "../middleware/upload.middleware.js";
 import {
   getUsers,
   updateProfile,
-} from "../controllers/user.controller.js";
+} from "../controllers/user.Controller.js";
 
 const router = express.Router();
 
