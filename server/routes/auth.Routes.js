@@ -4,18 +4,22 @@ import {
   loginUser,
   getProfile,
   updateProfile,
+  deleteAccount,
 } from "../controllers/auth.controller.js";
 import protect from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
+// Public
 router.post("/register", registerUser);
-
 router.post("/login", loginUser);
 
+// Protected
 router.get("/profile", protect, getProfile);
-
 router.put("/profile", protect, updateProfile);
+
+// NEW
+router.delete("/delete-account", protect, deleteAccount);
 
 router.get("/test", protect, (req, res) => {
   res.json({

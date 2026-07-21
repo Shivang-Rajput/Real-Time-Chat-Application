@@ -3,6 +3,7 @@ import api from "./api";
 // ==========================
 // Get Users
 // ==========================
+
 export const getUsers = async () => {
   const response = await api.get("/users");
   return response.data;
@@ -11,6 +12,7 @@ export const getUsers = async () => {
 // ==========================
 // Update Profile
 // ==========================
+
 export const updateProfile = async (formData) => {
   const response = await api.put(
     "/users/profile",
@@ -20,6 +22,18 @@ export const updateProfile = async (formData) => {
         "Content-Type": "multipart/form-data",
       },
     }
+  );
+
+  return response.data;
+};
+
+// ==========================
+// Delete Account
+// ==========================
+
+export const deleteAccount = async () => {
+  const response = await api.delete(
+    "/auth/delete-account"
   );
 
   return response.data;

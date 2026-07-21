@@ -1,10 +1,14 @@
-import { Trash2 } from "lucide-react";
+import { Trash2, Reply } from "lucide-react";
+import toast from "react-hot-toast";
+
 import { deleteMessage } from "../../services/messageService";
 
 function MessageBubble({
   message,
   isOwnMessage,
   onDelete,
+  onReply,
+  theme,
 }) {
   const handleDelete = async () => {
     const confirmDelete = window.confirm(
@@ -17,9 +21,12 @@ function MessageBubble({
       await deleteMessage(message._id);
 
       onDelete(message._id);
+
+      toast.success("Message deleted successfully 🗑️");
     } catch (error) {
       console.error(error);
-      alert("Failed to delete message.");
+
+      toast.error("Failed to delete message.");
     }
   };
 
@@ -29,31 +36,77 @@ function MessageBubble({
         isOwnMessage ? "justify-end" : "justify-start"
       }`}
     >
-      <div className="relative group">
+      <div className="relative group max-w-xs md:max-w-md">
 
-        {/* Delete Button */}
+        {/* Action Buttons */}
 
-        {isOwnMessage && (
+        <div
+          className={`absolute top-2 flex gap-2 opacity-0 group-hover:opacity-100 transition duration-200 z-20 ${
+            isOwnMessage ? "-left-16" : "-right-16"
+          }`}
+        >
           <button
-            onClick={handleDelete}
-            className="absolute -left-9 top-2 opacity-0 group-hover:opacity-100 transition"
+            type="button"
+            onClick={() => onReply(message)}
+            className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition"
+            title="Reply"
           >
-            <Trash2
-              size={18}
-              className="text-red-400 hover:text-red-600"
-            />
+            <Reply size={16} />
           </button>
-        )}
+
+          {isOwnMessage && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition"
+              title="Delete"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
 
         {/* Message */}
 
         <div
-          className={`max-w-xs md:max-w-md px-4 py-2 rounded-2xl break-words ${
+          className={`px-4 py-2 rounded-2xl break-words shadow transition-all duration-300 ${
             isOwnMessage
               ? "bg-green-500 text-white rounded-br-sm"
-              : "bg-slate-700 text-white rounded-bl-sm"
+              : theme === "dark"
+              ? "bg-slate-700 text-white rounded-bl-sm"
+              : "bg-white text-slate-900 border border-gray-200 rounded-bl-sm"
           }`}
         >
+          {/* Reply Preview */}
+
+          {message.replyTo && (
+            <div
+              className={`mb-2 px-3 py-2 rounded-lg border-l-4 ${
+                isOwnMessage
+                  ? "bg-green-600 border-white/60"
+                  : theme === "dark"
+                  ? "bg-slate-600 border-green-400"
+                  : "bg-gray-100 border-green-500"
+              }`}
+            >
+              <p className="text-xs font-semibold">
+                Reply
+              </p>
+
+              {message.replyTo.text && (
+                <p className="text-sm truncate">
+                  {message.replyTo.text}
+                </p>
+              )}
+
+              {message.replyTo.image && (
+                <p className="text-xs">
+                  📷 Photo
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Image */}
 
           {message.image && (
@@ -67,12 +120,22 @@ function MessageBubble({
           {/* Text */}
 
           {message.text && (
-            <p>{message.text}</p>
+            <p className="whitespace-pre-wrap break-words">
+              {message.text}
+            </p>
           )}
 
           {/* Time */}
 
-          <p className="text-[10px] text-right mt-1 opacity-70">
+          <p
+            className={`text-[10px] text-right mt-2 ${
+              isOwnMessage
+                ? "text-white/70"
+                : theme === "dark"
+                ? "text-gray-400"
+                : "text-gray-500"
+            }`}
+          >
             {new Date(message.createdAt).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -82,7 +145,7 @@ function MessageBubble({
           {/* Seen */}
 
           {isOwnMessage && (
-            <p className="text-[10px] text-right">
+            <p className="text-[10px] text-right text-white/80">
               {message.seen ? "✓✓" : "✓"}
             </p>
           )}

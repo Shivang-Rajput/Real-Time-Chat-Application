@@ -165,3 +165,26 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
+
+
+// ==========================
+// Delete Account
+// ==========================
+
+export const deleteAccount = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user._id);
+
+    res.status(200).json({
+      success: true,
+      message: "Account deleted successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};

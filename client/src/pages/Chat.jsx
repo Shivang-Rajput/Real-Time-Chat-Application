@@ -13,9 +13,12 @@ import {
 
 import { useSocket } from "../context/SocketContext";
 
-function Chat() {
+function Chat({ theme, toggleTheme }) {
   const [selectedUser, setSelectedUser] = useState(null);
+
   const [messages, setMessages] = useState([]);
+
+  const [replyMessage, setReplyMessage] = useState(null);
 
   const messagesEndRef = useRef(null);
 
@@ -29,14 +32,14 @@ function Chat() {
   // ==========================
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      if (!selectedUser) return;
+    if (!selectedUser) return;
 
+    const fetchMessages = async () => {
       try {
         const data = await getMessages(selectedUser._id);
         setMessages(data.messages);
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
       }
     };
 
@@ -44,57 +47,46 @@ function Chat() {
   }, [selectedUser]);
 
   // ==========================
-  // Mark Messages as Seen
+  // Mark Seen
   // ==========================
 
   useEffect(() => {
     if (!selectedUser) return;
 
-    const seenMessages = async () => {
-      try {
-        await markMessagesSeen(selectedUser._id);
-        console.log("✅ Messages marked as seen");
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    seenMessages();
+    markMessagesSeen(selectedUser._id).catch(console.error);
   }, [selectedUser]);
 
   // ==========================
-  // Listen for New Messages
+  // Receive Message
   // ==========================
 
   useEffect(() => {
     if (!newMessage || !selectedUser) return;
 
-    const senderId =
+    const sender =
       typeof newMessage.sender === "object"
         ? newMessage.sender._id
         : newMessage.sender;
 
-    const receiverId =
+    const receiver =
       typeof newMessage.receiver === "object"
         ? newMessage.receiver._id
         : newMessage.receiver;
 
     if (
-      senderId === selectedUser._id ||
-      receiverId === selectedUser._id
+      sender === selectedUser._id ||
+      receiver === selectedUser._id
     ) {
       setMessages((prev) => [...prev, newMessage]);
     }
   }, [newMessage, selectedUser]);
 
   // ==========================
-  // Real-Time Seen Update
+  // Seen Update
   // ==========================
 
   useEffect(() => {
     if (!messagesSeen || !selectedUser) return;
-
-    console.log("👀 Updating Seen Status");
 
     setMessages((prev) =>
       prev.map((msg) => {
@@ -122,73 +114,114 @@ function Chat() {
         return msg;
       })
     );
-  }, [messagesSeen, selectedUser?._id, currentUserId]);
+  }, [messagesSeen, selectedUser, currentUserId]);
 
   // ==========================
   // Auto Scroll
   // ==========================
 
   useEffect(() => {
+  const timer = setTimeout(() => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
+      block: "end",
     });
-  }, [messages]);
+  }, 50);
+
+  return () => clearTimeout(timer);
+}, [messages]);
 
   // ==========================
   // Send Message
   // ==========================
 
-  const handleSendMessage = async (text, image) => {
+ const handleSendMessage = async (
+  text,
+  image,
+  replyMessage
+) => {
+
   try {
     const data = await sendMessage(
       selectedUser._id,
       text,
-      image
+      image,
+      replyMessage
     );
 
-    setMessages((prev) => [...prev, data.data]);
-  } catch (error) {
-    console.error(error);
+
+    setMessages((prev) => {
+      
+      const updated = [...prev, data.data];
+
+      
+      return updated;
+    });
+
+    setReplyMessage(null);
+  } catch (err) {
+    console.error("SEND ERROR:", err);
   }
 };
 
-   // ==========================
-  // Delete Message
+  // ==========================
+  // Delete
+  // ==========================
+
+  const handleDeleteMessage = (id) => {
+    setMessages((prev) =>
+      prev.filter((msg) => msg._id !== id)
+    );
+  };
+
+  const handleReplyMessage = (message) => {
+  console.log("Reply clicked:", message);
+  setReplyMessage(message);
+};
+
 // ==========================
-
- const handleDeleteMessage = (messageId) => {
-   setMessages((prev) =>
-     prev.filter((message) => message._id !== messageId)
-   );
- };
-
+// DEBUG
+// ==========================
   return (
-    <div className="flex h-screen bg-slate-900">
+    <div
+      className={`flex h-screen ${
+        theme === "dark"
+          ? "bg-slate-900"
+          : "bg-gray-100"
+      }`}
+    >
       <ChatSidebar
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
+        theme={theme}
       />
 
       <div className="flex-1 flex flex-col">
         {selectedUser ? (
           <>
-            <ChatHeader user={selectedUser} />
+            <ChatHeader
+              user={selectedUser}
+              theme={theme}
+              toggleTheme={toggleTheme}
+            />
 
             <div className="flex-1 overflow-y-auto p-5">
               {messages.length > 0 ? (
                 messages.map((message) => (
                   <MessageBubble
-                     key={message._id}
-                      message={message}
-                         isOwnMessage={
-                           (
-                             typeof message.sender === "object"
-                               ? message.sender._id
-                               : message.sender
-                            ) === currentUser._id
-                          }
-                          onDelete={handleDeleteMessage}
-                         />
+  key={message._id}
+  message={message}
+  isOwnMessage={
+    (
+      typeof message.sender === "object"
+        ? message.sender._id
+        : message.sender
+    ) === currentUser._id
+  }
+  onDelete={handleDeleteMessage}
+  onReply={handleReplyMessage}
+  theme={theme}
+/>
                 ))
               ) : (
                 <p className="text-center text-gray-500 mt-10">
@@ -196,20 +229,49 @@ function Chat() {
                 </p>
               )}
 
-              <div ref={messagesEndRef}></div>
+              <div ref={messagesEndRef} />
             </div>
 
             <MessageInput
-              onSend={handleSendMessage}
-              selectedUser={selectedUser}
-              currentUser={currentUser}
-            />
+  onSend={handleSendMessage}
+  selectedUser={selectedUser}
+  currentUser={currentUser}
+  replyMessage={replyMessage}
+  setReplyMessage={setReplyMessage}
+  theme={theme}
+/>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <h1 className="text-3xl text-gray-500">
-              Select a chat 💬
-            </h1>
+          <div
+            className={`flex-1 flex items-center justify-center ${
+              theme === "dark"
+                ? "bg-slate-900"
+                : "bg-gray-100"
+            }`}
+          >
+            <div className="text-center">
+              <div className="text-7xl mb-5">💬</div>
+
+              <h1
+                className={`text-4xl font-bold mb-3 ${
+                  theme === "dark"
+                    ? "text-white"
+                    : "text-slate-900"
+                }`}
+              >
+                Welcome to Real-Time Chat
+              </h1>
+
+              <p
+                className={`text-lg ${
+                  theme === "dark"
+                    ? "text-gray-400"
+                    : "text-gray-600"
+                }`}
+              >
+                Select a conversation to start chatting.
+              </p>
+            </div>
           </div>
         )}
       </div>

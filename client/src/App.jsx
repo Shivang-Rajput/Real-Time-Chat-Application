@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -8,27 +9,80 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
+  const [theme, setTheme] = useState(
+    localStorage.getItem("theme") || "dark"
+  );
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) =>
+      prevTheme === "dark" ? "light" : "dark"
+    );
+  };
+
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    <div className={theme === "light" ? "light-theme" : ""}>
+      <BrowserRouter>
+        <Routes>
 
-        {/* Protected Route */}
-        <Route
-          path="/chat"
-          element={
-            <ProtectedRoute>
-              <Chat />
-            </ProtectedRoute>
-          }
-        />
+          {/* Login */}
+          <Route
+            path="/"
+            element={
+              <Login
+                theme={theme}
+                toggleTheme={toggleTheme}
+              />
+            }
+          />
 
-        {/* 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Login Alias */}
+          <Route
+            path="/login"
+            element={
+              <Login
+                theme={theme}
+                toggleTheme={toggleTheme}
+              />
+            }
+          />
+
+          {/* Register */}
+          <Route
+            path="/register"
+            element={
+              <Register
+                theme={theme}
+                toggleTheme={toggleTheme}
+              />
+            }
+          />
+
+          {/* Protected Chat */}
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <Chat
+                  theme={theme}
+                  toggleTheme={toggleTheme}
+                />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 404 */}
+          <Route
+            path="*"
+            element={<NotFound />}
+          />
+
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 

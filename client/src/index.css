@@ -1,1 +1,84 @@
 @import "tailwindcss";
+
+/* Smooth transition */
+
+* {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* ===========================
+   LIGHT THEME
+=========================== */
+
+.light-theme {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Main backgrounds */
+
+.light-theme .bg-slate-900 {
+  background: #f1f5f9 !important;
+}
+
+.light-theme .bg-slate-800 {
+  background: #ffffff !important;
+}
+
+.light-theme .bg-slate-700 {
+  background: #e5e7eb !important;
+}
+
+/* Borders */
+
+.light-theme .border-slate-700 {
+  border-color: #d1d5db !important;
+}
+
+/* Text */
+
+.light-theme .text-white {
+  color: #111827 !important;
+}
+
+.light-theme .text-gray-400 {
+  color: #6b7280 !important;
+}
+
+.light-theme .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+/* Inputs */
+
+.light-theme input {
+  color: #111827 !important;
+}
+
+.light-theme input::placeholder {
+  color: #6b7280;
+}
+
+/* Buttons */
+
+.light-theme button {
+  transition: 0.2s;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 20px;
+}
+
+.light-theme ::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+}

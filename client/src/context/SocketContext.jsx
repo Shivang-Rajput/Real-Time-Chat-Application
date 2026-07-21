@@ -6,6 +6,8 @@ import {
 } from "react";
 
 import { io } from "socket.io-client";
+import toast from "react-hot-toast";
+
 import { useAuth } from "./AuthContext";
 
 const SocketContext = createContext();
@@ -35,17 +37,36 @@ export const SocketProvider = ({ children }) => {
       setOnlineUsers(users);
     });
 
+    // ==========================
+    // New Message
+    // ==========================
+
     newSocket.on("newMessage", (message) => {
       console.log("📩 New Message:", message);
 
-      // Trigger every component listening
+      // Show notification only for received messages
+      if (
+        user &&
+        message.sender.toString() !== user._id.toString()
+      ) {
+        toast.success("📩 New Message");
+      }
+
       setNewMessage(message);
     });
 
+    // ==========================
+    // Messages Seen
+    // ==========================
+
     newSocket.on("messagesSeen", (data) => {
-    console.log("👀 Messages Seen:", data);
-    setMessagesSeen(data);
+      console.log("👀 Messages Seen:", data);
+      setMessagesSeen(data);
     });
+
+    // ==========================
+    // Typing
+    // ==========================
 
     newSocket.on("typing", (senderId) => {
       setTypingUser(senderId);
@@ -58,7 +79,7 @@ export const SocketProvider = ({ children }) => {
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (!socket || !user) return;
@@ -68,14 +89,14 @@ export const SocketProvider = ({ children }) => {
 
   return (
     <SocketContext.Provider
-  value={{
-    socket,
-    onlineUsers,
-    typingUser,
-    newMessage,
-    messagesSeen,
-  }}
->
+      value={{
+        socket,
+        onlineUsers,
+        typingUser,
+        newMessage,
+        messagesSeen,
+      }}
+    >
       {children}
     </SocketContext.Provider>
   );

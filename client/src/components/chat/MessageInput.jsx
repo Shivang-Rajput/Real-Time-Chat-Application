@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../../context/SocketContext";
 import EmojiPicker from "emoji-picker-react";
 import {
@@ -12,7 +12,14 @@ function MessageInput({
   onSend,
   selectedUser,
   currentUser,
+  replyMessage,
+  setReplyMessage,
+  theme,
 }) {
+
+
+console.log("ReplyMessage in MessageInput:", replyMessage);
+
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [image, setImage] = useState(null);
@@ -55,8 +62,9 @@ function MessageInput({
   // =====================
 
   const handleEmoji = (emojiData) => {
-    setText((prev) => prev + emojiData.emoji);
-  };
+  setText((prev) => prev + emojiData.emoji);
+  setShowEmoji(false);
+};
 
   // =====================
   // Image
@@ -68,7 +76,6 @@ function MessageInput({
     if (!file) return;
 
     setImage(file);
-
     setPreview(URL.createObjectURL(file));
   };
 
@@ -77,29 +84,37 @@ function MessageInput({
   // =====================
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  
+  e.preventDefault();
 
-    if (!text.trim() && !image) return;
+  
+  if (!text.trim() && !image) {
+    console.log("❌ Empty message. Nothing sent.");
+    return;
+  }
 
-    onSend(text, image);
+  
+  onSend(text, image, replyMessage);
 
-    setText("");
-    setImage(null);
-    setPreview("");
+  
+  setText("");
+  setImage(null);
+  setPreview("");
+  setReplyMessage(null);
 
-    if (socket && selectedUser) {
-      socket.emit("stopTyping", {
-        senderId: currentUser._id,
-        receiverId: selectedUser._id,
-      });
-    }
-  };
+  if (socket && selectedUser) {
+    socket.emit("stopTyping", {
+      senderId: currentUser._id,
+      receiverId: selectedUser._id,
+    });
+  }
+
+ };
 
   return (
     <>
       {preview && (
         <div className="px-5 py-3 bg-slate-800 border-t border-slate-700">
-
           <div className="relative w-fit">
 
             <img
@@ -121,6 +136,47 @@ function MessageInput({
           </div>
         </div>
       )}
+
+      {replyMessage && (
+  <div
+    className={`px-4 py-3 border-t ${
+      theme === "dark"
+        ? "bg-slate-800 border-slate-700"
+        : "bg-gray-100 border-gray-300"
+    }`}
+  >
+    <div
+      className={`relative rounded-lg border-l-4 border-green-500 p-3 ${
+        theme === "dark"
+          ? "bg-slate-700"
+          : "bg-white"
+      }`}
+    >
+      <button
+        onClick={() => setReplyMessage(null)}
+        className="absolute right-2 top-2"
+      >
+        <X size={16} />
+      </button>
+
+      <p className="text-xs font-semibold text-green-500">
+        Replying to
+      </p>
+
+      {replyMessage?.text && (
+        <p className="text-sm truncate mt-1">
+          {replyMessage.text}
+        </p>
+      )}
+
+      {replyMessage?.image && (
+        <p className="text-sm mt-1">
+          📷 Photo
+        </p>
+      )}
+    </div>
+  </div>
+)}
 
       <form
         onSubmit={handleSubmit}
@@ -164,7 +220,7 @@ function MessageInput({
           onChange={handleImage}
         />
 
-        {/* Input */}
+        {/* Text */}
 
         <input
           type="text"

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
 import api from "../services/api";
 
 function Register() {
@@ -24,18 +26,17 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (
       !formData.fullName ||
       !formData.email ||
       !formData.password ||
       !formData.confirmPassword
     ) {
-      return alert("Please fill all fields.");
+      return toast.error("Please fill all fields.");
     }
 
     if (formData.password !== formData.confirmPassword) {
-      return alert("Passwords do not match.");
+      return toast.error("Passwords do not match.");
     }
 
     try {
@@ -47,14 +48,15 @@ function Register() {
         password: formData.password,
       });
 
-      alert(data.message || "User Registered Successfully 🎉");
+      toast.success(
+        data.message || "User Registered Successfully 🎉"
+      );
 
-      // Redirect to Login Page
       navigate("/");
     } catch (error) {
       console.error(error);
 
-      alert(
+      toast.error(
         error.response?.data?.message ||
           "Registration failed."
       );
@@ -64,72 +66,73 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
-      <div className="w-full max-w-md bg-slate-800 rounded-xl shadow-xl p-8">
-
-        <h1 className="text-3xl font-bold text-white text-center mb-8">
+    <div className="min-h-screen bg-slate-900 flex justify-center items-center px-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-slate-800 p-8 rounded-xl w-full max-w-md space-y-5"
+      >
+        <h1 className="text-3xl text-center text-white font-bold">
           Create Account
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <input
+          type="text"
+          name="fullName"
+          placeholder="Full Name"
+          value={formData.fullName}
+          onChange={handleChange}
+          required
+          className="w-full p-3 rounded bg-slate-700 text-white outline-none"
+        />
 
-          <input
-            type="text"
-            name="fullName"
-            placeholder="Full Name"
-            value={formData.fullName}
-            onChange={handleChange}
-            className="w-full bg-slate-700 rounded-lg px-4 py-3 text-white outline-none"
-          />
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className="w-full p-3 rounded bg-slate-700 text-white outline-none"
+        />
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full bg-slate-700 rounded-lg px-4 py-3 text-white outline-none"
-          />
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+          className="w-full p-3 rounded bg-slate-700 text-white outline-none"
+        />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full bg-slate-700 rounded-lg px-4 py-3 text-white outline-none"
-          />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          required
+          className="w-full p-3 rounded bg-slate-700 text-white outline-none"
+        />
 
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className="w-full bg-slate-700 rounded-lg px-4 py-3 text-white outline-none"
-          />
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded font-semibold transition disabled:opacity-50"
+        >
+          {loading ? "Creating Account..." : "Register"}
+        </button>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 rounded-lg py-3 font-semibold text-white transition disabled:opacity-50"
-          >
-            {loading ? "Creating Account..." : "Register"}
-          </button>
-
-        </form>
-
-        <p className="text-center text-gray-400 mt-6">
+        <p className="text-center text-gray-400">
           Already have an account?{" "}
           <Link
             to="/"
-            className="text-blue-400 hover:underline"
+            className="text-green-500 hover:text-green-400 font-semibold"
           >
             Login
           </Link>
         </p>
-
-      </div>
+      </form>
     </div>
   );
 }

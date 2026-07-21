@@ -6,7 +6,16 @@ import messageRoutes from "./routes/message.Routes.js";
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // Local React app
+      "https://your-frontend-url.vercel.app", // Replace after deployment
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);

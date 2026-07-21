@@ -20,28 +20,36 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Text Message
+    // Text
     text: {
       type: String,
       trim: true,
       default: "",
     },
 
-    // Image URL (Cloudinary)
+    // Image
     image: {
       type: String,
       default: "",
     },
 
-    // Seen Status
+    // ==========================
+    // Reply Message
+    // ==========================
+
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
+    },
+
+    // Seen
     seen: {
       type: Boolean,
       default: false,
     },
 
-    // ==========================
     // Delete For Me
-    // ==========================
     deletedFor: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -54,7 +62,7 @@ const messageSchema = new mongoose.Schema(
   }
 );
 
-// Ensure at least one of text or image exists
+// At least text or image
 messageSchema.pre("validate", function (next) {
   if (!this.text && !this.image) {
     this.invalidate(

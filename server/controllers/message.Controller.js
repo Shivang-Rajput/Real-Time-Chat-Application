@@ -8,7 +8,7 @@ export const sendMessage = async (req, res) => {
     const senderId = req.user._id;
     const receiverId = req.params.receiverId;
 
-    let { text } = req.body;
+    let { text, replyTo } = req.body;
 
     let imageUrl = "";
 
@@ -52,26 +52,30 @@ export const sendMessage = async (req, res) => {
 
     // Create Message
     const message = await Message.create({
-      conversationId: conversation._id,
-      sender: senderId,
-      receiver: receiverId,
-      text: text || "",
-      image: imageUrl,
-    });
+  conversationId: conversation._id,
+  sender: senderId,
+  receiver: receiverId,
+  text: text || "",
+  image: imageUrl,
+  replyTo: replyTo || null,
+});
 
     conversation.lastMessage = message._id;
     await conversation.save();
 
-    // Socket
+    const populatedMessage = await Message.findById(message._id)
+  .populate("replyTo");
+
+    // Real-time socket
     const receiverSocketId = getReceiverSocketId(receiverId);
 
     if (receiverSocketId) {
-      getIO().to(receiverSocketId).emit("newMessage", message);
+      getIO().to(receiverSocketId).emit("newMessage", populatedMessage);
     }
 
     res.status(201).json({
       success: true,
-      data: message,
+      data: populatedMessage,
     });
   } catch (error) {
     console.error(error);
@@ -82,7 +86,6 @@ export const sendMessage = async (req, res) => {
     });
   }
 };
-
 
 
 export const getMessages = async (req, res) => {
@@ -104,12 +107,17 @@ export const getMessages = async (req, res) => {
     }
 
     // Get all messages
-    const messages = await Message.find({
+   const messages = await Message.find({
   conversationId: conversation._id,
   deletedFor: {
     $ne: senderId,
   },
-}).sort({ createdAt: 1 });
+})
+.populate({
+  path: "replyTo",
+  select: "text image sender",
+})
+.sort({ createdAt: 1 });
 
     res.status(200).json({
       success: true,
