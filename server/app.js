@@ -1,18 +1,32 @@
 import express from "express";
 import cors from "cors";
-import authRoutes from "./routes/auth.Routes.js";
+
+import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.Routes.js";
 import messageRoutes from "./routes/message.Routes.js";
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://real-time-chat-application-psi-lac.vercel.app",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // Local React app
-      "https://your-frontend-url.vercel.app", // Replace after deployment
-    ],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (Postman, mobile apps)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
