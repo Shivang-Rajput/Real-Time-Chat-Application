@@ -23,11 +23,19 @@ export const SocketProvider = ({ children }) => {
   const [messagesSeen, setMessagesSeen] = useState(null);
 
   useEffect(() => {
-    // Backend URL (remove /api for Socket.IO)
-    const SOCKET_URL = import.meta.env.VITE_API_URL.replace("/api", "");
+    // ==========================
+    // Production Safe Backend URL
+    // ==========================
+
+    const API_URL =
+      import.meta.env.VITE_API_URL ||
+      "https://real-time-chat-application-backend-mprn.onrender.com/api";
+
+    const SOCKET_URL = API_URL.replace("/api", "");
 
     const newSocket = io(SOCKET_URL, {
       transports: ["websocket"],
+      withCredentials: true,
     });
 
     setSocket(newSocket);
@@ -37,7 +45,7 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("connect_error", (err) => {
-      console.error("❌ Socket Connection Error:", err.message);
+      console.error("❌ Socket Error:", err.message);
     });
 
     newSocket.on("onlineUsers", (users) => {
