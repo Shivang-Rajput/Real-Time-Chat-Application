@@ -18,7 +18,6 @@ function MessageInput({
 }) {
 
 
-console.log("ReplyMessage in MessageInput:", replyMessage);
 
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
