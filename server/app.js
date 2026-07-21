@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 
-import authRoutes from "./routes/auth.routes.js";
+import authRoutes from "./routes/auth.Routes.js";
 import userRoutes from "./routes/user.Routes.js";
 import messageRoutes from "./routes/message.Routes.js";
 
