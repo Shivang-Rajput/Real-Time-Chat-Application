@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import api from "../services/api";
-import { useAuth } from "../context/AuthContext";
+import api from "../services/api.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function Login() {
   const [formData, setFormData] = useState({

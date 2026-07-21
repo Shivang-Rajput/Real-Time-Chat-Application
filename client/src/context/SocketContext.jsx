@@ -8,7 +8,7 @@ import {
 import { io } from "socket.io-client";
 import toast from "react-hot-toast";
 
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./AuthContext.jsx";
 
 const SocketContext = createContext();
 
@@ -23,14 +23,21 @@ export const SocketProvider = ({ children }) => {
   const [messagesSeen, setMessagesSeen] = useState(null);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:5000", {
+    // Backend URL (remove /api for Socket.IO)
+    const SOCKET_URL = import.meta.env.VITE_API_URL.replace("/api", "");
+
+    const newSocket = io(SOCKET_URL, {
       transports: ["websocket"],
     });
 
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
-      console.log("✅ Connected:", newSocket.id);
+      console.log("✅ Socket Connected:", newSocket.id);
+    });
+
+    newSocket.on("connect_error", (err) => {
+      console.error("❌ Socket Connection Error:", err.message);
     });
 
     newSocket.on("onlineUsers", (users) => {
@@ -42,9 +49,6 @@ export const SocketProvider = ({ children }) => {
     // ==========================
 
     newSocket.on("newMessage", (message) => {
-      console.log("📩 New Message:", message);
-
-      // Show notification only for received messages
       if (
         user &&
         message.sender.toString() !== user._id.toString()
@@ -60,7 +64,6 @@ export const SocketProvider = ({ children }) => {
     // ==========================
 
     newSocket.on("messagesSeen", (data) => {
-      console.log("👀 Messages Seen:", data);
       setMessagesSeen(data);
     });
 

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { User } from "lucide-react";
 
-import RoomCard from "./RoomCard";
-import ProfileModal from "./ProfileModal";
+import RoomCard from "./RoomCard.jsx";
+import ProfileModal from "./ProfileModal.jsx";
 
-import { getUsers } from "../../services/roomService";
-import { useSocket } from "../../context/SocketContext";
+import { getUsers } from "../../services/roomService.js";
+import { useSocket } from "../../context/SocketContext.jsx";
 
 function ChatSidebar({
   selectedUser,

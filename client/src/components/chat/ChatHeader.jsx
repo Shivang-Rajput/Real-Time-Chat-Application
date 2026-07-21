@@ -1,5 +1,5 @@
 import { Moon, Sun } from "lucide-react";
-import { useSocket } from "../../context/SocketContext";
+import { useSocket } from "../../context/SocketContext.jsx";
 
 function ChatHeader({
   user,

@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 
-import ChatSidebar from "../components/chat/ChatSidebar";
-import ChatHeader from "../components/chat/ChatHeader";
-import MessageBubble from "../components/chat/MessageBubble";
-import MessageInput from "../components/chat/MessageInput";
+import ChatSidebar from "../components/chat/ChatSidebar.jsx";
+import ChatHeader from "../components/chat/ChatHeader.jsx";
+import MessageBubble from "../components/chat/MessageBubble.jsx";
+import MessageInput from "../components/chat/MessageInput.jsx";
 
 import {
   getMessages,
   sendMessage,
   markMessagesSeen,
-} from "../services/messageService";
+} from "../services/messageService.js";
 
-import { useSocket } from "../context/SocketContext";
+import { useSocket } from "../context/SocketContext.jsx";
 
 function Chat({ theme, toggleTheme }) {
   const [selectedUser, setSelectedUser] = useState(null);

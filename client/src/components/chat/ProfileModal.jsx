@@ -3,11 +3,11 @@ import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext.jsx";
 import {
   updateProfile,
   deleteAccount,
-} from "../../services/roomService";
+} from "../../services/roomService.js";
 
 function ProfileModal({
   user,

@@ -1,12 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Chat from "./pages/Chat";
-import NotFound from "./pages/NotFound";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import Chat from "./pages/Chat.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
   const [theme, setTheme] = useState(

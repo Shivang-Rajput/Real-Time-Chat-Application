@@ -1,4 +1,4 @@
-import { useSocket } from "../../context/SocketContext";
+import { useSocket } from "../../context/SocketContext.jsx";
 
 function TypingIndicator({ selectedUser }) {
   const { typingUser } = useSocket();

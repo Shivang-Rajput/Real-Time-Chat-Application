@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSocket } from "../../context/SocketContext";
+import { useSocket } from "../../context/SocketContext.jsx";
 import EmojiPicker from "emoji-picker-react";
 import {
   Image,

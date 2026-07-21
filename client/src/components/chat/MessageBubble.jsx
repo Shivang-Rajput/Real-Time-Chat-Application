@@ -1,7 +1,7 @@
 import { Trash2, Reply } from "lucide-react";
 import toast from "react-hot-toast";
 
-import { deleteMessage } from "../../services/messageService";
+import { deleteMessage } from "../../services/messageService.js";
 
 function MessageBubble({
   message,
