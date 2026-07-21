@@ -5,8 +5,8 @@ import {
   getProfile,
   updateProfile,
   deleteAccount,
-} from "../controllers/auth.controller.js";
-import protect from "../middleware/auth.middleware.js";
+} from "../controllers/auth.Controller.js";
+import protect from "../middleware/auth.Middleware.js";
 
 const router = express.Router();
 
